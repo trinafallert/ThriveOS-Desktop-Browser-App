@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#f0e6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ddf4ff;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#e8d5ff;stop-opacity:0" />
+    </radialGradient>
+    <linearGradient id="swirl1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c9a8f5;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="swirl2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#93c5fd;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#67e8f9;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="swirl3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#86efac;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#6ee7b7;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="swirl4" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#f9a8d4;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#fca5a5;stop-opacity:0.4" />
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="512" cy="512" r="460" />
+    </clipPath>
+  </defs>
+  <circle cx="512" cy="512" r="490" fill="none" stroke="#e0d4ff" stroke-width="8" opacity="0.6"/>
+  <circle cx="512" cy="512" r="460" fill="url(#bgGrad)" />
+  <g clip-path="url(#circleClip)">
+    <path d="M 150 310 C 305 100, 665 155, 768 410 C 870 665, 716 870, 512 845 C 308 820, 204 665, 281 512 C 358 359, 512 333, 614 410"
+          fill="none" stroke="url(#swirl1)" stroke-width="60" stroke-linecap="round" opacity="0.75"/>
+    <path d="M 819 230 C 665 50, 307 128, 205 358 C 103 588, 230 819, 435 870 C 640 920, 819 793, 844 588 C 870 384, 742 281, 614 307"
+          fill="none" stroke="url(#swirl2)" stroke-width="50" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 512 128 C 742 154, 896 358, 860 563 C 824 768, 665 896, 486 860 C 307 824, 194 691, 214 512"
+          fill="none" stroke="url(#swirl3)" stroke-width="40" stroke-linecap="round" opacity="0.65"/>
+    <path d="M 358 205 C 563 77, 819 256, 793 460 C 768 665, 588 793, 409 742 C 230 691, 179 537, 256 409 C 333 281, 460 256, 563 333 C 665 410, 691 537, 614 614"
+          fill="none" stroke="url(#swirl4)" stroke-width="36" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="512" cy="512" r="179" fill="url(#glowGrad)" />
+    <circle cx="512" cy="512" r="30" fill="#ffffff" opacity="0.9"/>
+    <circle cx="512" cy="512" r="15" fill="#d8b4fe" opacity="0.8"/>
+  </g>
+  <circle cx="512" cy="512" r="460" fill="none" stroke="#c4b5fd" stroke-width="10" opacity="0.4"/>
+</svg>

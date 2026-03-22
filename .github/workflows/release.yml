@@ -1,4 +1,4 @@
-name: Release
+name: Release ThriveOS Desktop
 
 on:
   push:
@@ -7,9 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.0.0, without the v prefix)'
+        description: 'Version (e.g. v1.0.0)'
         required: false
-        default: ''
 
 permissions:
   contents: write
@@ -22,92 +21,47 @@ jobs:
       matrix:
         include:
           - platform: macos
-            runner: macos-latest
-            config: packages/browseros/build/config/release.macos.yaml
-            artifact_name: ThriveOS.dmg
-            artifact_path: packages/browseros/out/ThriveOS.dmg
+            os: macos-latest
+            artifact_glob: 'electron/dist/*.dmg'
+            artifact_name: ThriveOS-mac
 
           - platform: windows
-            runner: windows-latest
-            config: packages/browseros/build/config/release.windows.yaml
-            artifact_name: ThriveOS_installer.exe
-            artifact_path: packages/browseros/out/ThriveOS_installer.exe
+            os: windows-latest
+            artifact_glob: 'electron/dist/*.exe'
+            artifact_name: ThriveOS-win
 
           - platform: linux
-            runner: ubuntu-latest
-            config: packages/browseros/build/config/release.linux.yaml
-            artifact_name: ThriveOS.AppImage
-            artifact_path: packages/browseros/out/ThriveOS.AppImage
+            os: ubuntu-latest
+            artifact_glob: 'electron/dist/*.AppImage'
+            artifact_name: ThriveOS-linux
 
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          submodules: recursive
-          fetch-depth: 0
+          node-version: 20
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: packages/browseros/requirements.txt
+      - name: Install dependencies
+        working-directory: electron
+        run: npm ci
 
-      - name: Install Python dependencies
-        working-directory: packages/browseros
-        run: pip install -r requirements.txt
-
-      - name: Determine version
-        id: version
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          elif [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo '0.0.0-dev')"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Building version: $VERSION"
-
-      - name: Run build system (macOS)
-        if: matrix.platform == 'macos'
-        working-directory: packages/browseros
+      - name: Build — ${{ matrix.platform }}
+        working-directory: electron
+        run: npm run build:${{ matrix.platform }}
         env:
-          MACOS_CERTIFICATE_NAME: ${{ secrets.MACOS_CERTIFICATE_NAME }}
-          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
-          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-          BROWSEROS_VERSION: ${{ steps.version.outputs.version }}
-        run: python -m build build --config build/config/release.macos.yaml
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Run build system (Windows)
-        if: matrix.platform == 'windows'
-        working-directory: packages/browseros
-        env:
-          CODE_SIGN_TOOL_PATH: ${{ secrets.CODE_SIGN_TOOL_PATH }}
-          ESIGNER_USERNAME: ${{ secrets.ESIGNER_USERNAME }}
-          ESIGNER_PASSWORD: ${{ secrets.ESIGNER_PASSWORD }}
-          ESIGNER_TOTP_SECRET: ${{ secrets.ESIGNER_TOTP_SECRET }}
-          BROWSEROS_VERSION: ${{ steps.version.outputs.version }}
-        run: python -m build build --config build/config/release.windows.yaml
-
-      - name: Run build system (Linux)
-        if: matrix.platform == 'linux'
-        working-directory: packages/browseros
-        env:
-          BROWSEROS_VERSION: ${{ steps.version.outputs.version }}
-        run: python -m build build --config build/config/release.linux.yaml
-
-      - name: Upload installer artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          path: ${{ matrix.artifact_glob }}
           if-no-files-found: error
           retention-days: 7
 
@@ -115,55 +69,42 @@ jobs:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
-    if: always() && (needs.build.result == 'success')
+    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Determine version
-        id: version
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          elif [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo '0.0.0-dev')"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Download ThriveOS.dmg
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ThriveOS.dmg
-          path: release-assets/
+          path: artifacts
 
-      - name: Download ThriveOS_installer.exe
-        uses: actions/download-artifact@v4
-        with:
-          name: ThriveOS_installer.exe
-          path: release-assets/
-
-      - name: Download ThriveOS.AppImage
-        uses: actions/download-artifact@v4
-        with:
-          name: ThriveOS.AppImage
-          path: release-assets/
+      - name: List artifacts
+        run: find artifacts -type f
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: ThriveOS v${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+          name: ThriveOS ${{ github.ref_name }}
+          body: |
+            ## ThriveOS Desktop ${{ github.ref_name }}
+
+            Download the installer for your platform:
+
+            | Platform | File |
+            |----------|------|
+            | macOS (Intel + Apple Silicon) | `ThriveOS.dmg` |
+            | Windows | `ThriveOS_installer.exe` |
+            | Linux | `ThriveOS.AppImage` |
+
+            ### Installation
+            - **macOS**: Open `.dmg` → drag ThriveOS to Applications
+            - **Windows**: Run the `.exe` installer
+            - **Linux**: `chmod +x ThriveOS.AppImage` then run it
+
+            > First launch may show a security warning (builds are unsigned).
+            > macOS: right-click → Open. Windows: "More info" → "Run anyway".
           files: |
-            release-assets/ThriveOS.dmg
-            release-assets/ThriveOS_installer.exe
-            release-assets/ThriveOS.AppImage
+            artifacts/ThriveOS-mac/*.dmg
+            artifacts/ThriveOS-win/*.exe
+            artifacts/ThriveOS-linux/*.AppImage
+          generate_release_notes: false
+          fail_on_unmatched_files: false

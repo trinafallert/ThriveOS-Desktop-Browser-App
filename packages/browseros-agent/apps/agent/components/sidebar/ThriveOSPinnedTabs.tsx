@@ -21,7 +21,7 @@ type ThriveOSTab = {
 
 const thriveOSTabs: ThriveOSTab[] = [
   {
-    name: 'Overview',
+    name: 'My Home',
     url: 'https://thriveos.app/dashboard',
     icon: LayoutDashboard,
     variant: 'overview',
@@ -73,21 +73,23 @@ export const ThriveOSPinnedTabs: FC<ThriveOSPinnedTabsProps> = ({
         <nav className="space-y-0.5">
           {thriveOSTabs.map((tab) => {
             const Icon = tab.icon
+            const isHome = tab.variant === 'overview'
             const button = (
               <button
                 type="button"
                 onClick={() => openThriveOSTab(tab.url)}
                 style={getTabStyle(tab.variant)}
                 className={cn(
-                  'relative flex h-9 w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md px-3 font-medium text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                  tab.variant === 'overview' && 'text-violet-400 dark:text-violet-300',
-                  (tab.variant === 'bizbox' || tab.variant === 'lifebud') && 'text-sidebar-foreground',
+                  'relative flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md px-3 font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                  isHome
+                    ? 'h-12 text-sm text-violet-400 dark:text-violet-300'
+                    : 'h-9 text-sm text-sidebar-foreground',
                 )}
               >
                 <Icon
                   className={cn(
-                    'size-4 shrink-0',
-                    tab.variant === 'overview' && 'text-violet-400 dark:text-violet-300',
+                    'shrink-0',
+                    isHome ? 'size-5 text-violet-400 dark:text-violet-300' : 'size-4',
                     tab.variant === 'bizbox' && 'text-blue-400',
                     tab.variant === 'lifebud' && 'text-pink-400',
                   )}
@@ -95,6 +97,7 @@ export const ThriveOSPinnedTabs: FC<ThriveOSPinnedTabsProps> = ({
                 <span
                   className={cn(
                     'truncate transition-opacity duration-200',
+                    isHome && 'font-semibold',
                     expanded ? 'opacity-100' : 'opacity-0',
                   )}
                 >

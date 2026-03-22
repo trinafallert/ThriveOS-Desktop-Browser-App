@@ -6,7 +6,7 @@
  * regular tabs in Chromium's vertical tab strip.
  *
  * Visual hierarchy in the left tab strip:
- *   📊 Overview   ← pinned, position 0 (glow highlight)
+ *   🏠 My Home    ← pinned, position 0 (glow highlight, taller tab)
  *   💼 Bizbox     ← pinned, position 1 (blue glow underline)
  *   🌸 Lifebud    ← pinned, position 2 (pink glow underline)
  *   ─────────────────
@@ -15,7 +15,7 @@
 
 export const THRIVEOS_TABS = [
   {
-    name: 'Overview',
+    name: 'My Home',
     url: 'https://thriveos.app/dashboard',
     index: 0,
   },

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { SidebarBranding } from './SidebarBranding'
 import { SidebarNavigation } from './SidebarNavigation'
 import { SidebarUserFooter } from './SidebarUserFooter'
+import { ThriveOSPinnedTabs } from './ThriveOSPinnedTabs'
 
 interface AppSidebarProps {
   expanded?: boolean
@@ -21,6 +22,7 @@ export const AppSidebar: FC<AppSidebarProps> = ({
       )}
     >
       <SidebarBranding expanded={expanded} />
+      <ThriveOSPinnedTabs expanded={expanded} />
       <SidebarNavigation expanded={expanded} />
       <SidebarUserFooter
         expanded={expanded}

@@ -21,6 +21,7 @@ import { searchActionsStorage } from '@/lib/search-actions/searchActionsStorage'
 import { selectedTextStorage } from '@/lib/selected-text/selectedTextStorage'
 import { stopAgentStorage } from '@/lib/stop-agent/stop-agent-storage'
 import { scheduledJobRuns } from './scheduledJobRuns'
+import { ensureThriveOSPinnedTabs } from './thriveosStartupTabs'
 
 export default defineBackground(() => {
   chrome.sidePanel.setOptions({ enabled: false })
@@ -55,6 +56,15 @@ export default defineBackground(() => {
     }
   })
 
+  // Ensure ThriveOS tabs are pinned at top of the vertical tab strip on startup
+  chrome.runtime.onStartup.addListener(() => {
+    ensureThriveOSPinnedTabs().catch(() => null)
+  })
+
+  chrome.windows.onCreated.addListener(() => {
+    ensureThriveOSPinnedTabs().catch(() => null)
+  })
+
   chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
       chrome.tabs.create({
@@ -65,6 +75,9 @@ export default defineBackground(() => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
       checkAndShowChangelog().catch(() => null)
     }
+
+    // Pin ThriveOS tabs after install/update
+    ensureThriveOSPinnedTabs().catch(() => null)
   })
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

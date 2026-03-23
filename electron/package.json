@@ -1,67 +1,83 @@
 {
-    "name": "thriveos",
-    "version": "1.0.0",
-    "description": "ThriveOS Desktop Browser — your AI-powered OS for life and business",
-    "main": "main.js",
-    "repository": {
-          "type": "git",
-          "url": "https://github.com/trinafallert/ThriveOS-Desktop-Browser-App.git"
+  "name": "thriveos",
+  "version": "1.0.0",
+  "description": "ThriveOS Desktop Browser \u2014 your AI-powered OS for life and business",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trinafallert/ThriveOS-Desktop-Browser-App.git"
+  },
+  "author": "ThriveOS",
+  "scripts": {
+    "start": "electron .",
+    "build:macos": "electron-builder --mac",
+    "build:windows": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.thriveos.browser",
+    "productName": "ThriveOS",
+    "directories": {
+      "output": "dist"
     },
-    "author": "ThriveOS",
-    "scripts": {
-          "start": "electron .",
-          "build:mac": "electron-builder --mac",
-          "build:win": "electron-builder --win",
-          "build:linux": "electron-builder --linux"
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "build/**"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.icns",
+      "category": "public.app-category.productivity",
+      "artifactName": "ThriveOS.dmg"
     },
-    "build": {
-          "appId": "com.thriveos.browser",
-          "productName": "ThriveOS",
-          "directories": {
-                  "output": "dist"
-          },
-          "files": [
-                  "main.js",
-                  "preload.js",
-                  "src/**",
-                  "build/**"
-          ],
-          "mac": {
-                  "target": [
-                            { "target": "dmg", "arch": ["x64", "arm64"] }
-                  ],
-                  "icon": "build/icons/icon.icns",
-                  "category": "public.app-category.productivity",
-                  "artifactName": "ThriveOS.dmg"
-          },
-          "win": {
-                  "target": [
-                            { "target": "nsis", "arch": ["x64"] }
-                  ],
-                  "icon": "build/icons/icon.ico",
-                  "artifactName": "ThriveOS_installer.exe"
-          },
-          "linux": {
-                  "target": [
-                            { "target": "AppImage", "arch": ["x64"] }
-                  ],
-                  "icon": "build/icons/icon.png",
-                  "category": "Network",
-                  "artifactName": "ThriveOS.AppImage"
-          },
-          "nsis": {
-                  "oneClick": false,
-                  "allowToChangeInstallationDirectory": true,
-                  "installerIcon": "build/icons/icon.ico",
-                  "uninstallerIcon": "build/icons/icon.ico"
-          },
-          "dmg": {
-                  "background": null,
-                  "backgroundColor": "#0f172a"
-          }
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.ico",
+      "artifactName": "ThriveOS_installer.exe"
     },
-    "devDependencies": {
-          "electron": "^32.0.0",
-          "electron-builder": "^25.0.0"
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.png",
+      "category": "Network",
+      "artifactName": "ThriveOS.AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icons/icon.ico",
+      "uninstallerIcon": "build/icons/icon.ico"
+    },
+    "dmg": {
+      "background": null,
+      "backgroundColor": "#0f172a"
     }
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  }
 }

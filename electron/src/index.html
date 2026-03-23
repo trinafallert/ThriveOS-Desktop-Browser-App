@@ -8,18 +8,58 @@
   <link rel="stylesheet" href="browser.css" />
 </head>
 <body>
-  <div id="toolbar">
+
+  <!-- ═══ ROW 1: ThriveOS Section Tabs (My Home, Bizbox, Lifebud) ═══ -->
+  <div id="section-bar">
+    <div class="section-bar-left">
+      <!-- macOS traffic light spacer -->
+      <div class="traffic-light-spacer"></div>
+
+      <!-- My Home — enlarged, glowing, prominent -->
+      <button class="section-tab home-tab active" id="tab-home" data-section="home">
+        <span class="home-glow-ring"></span>
+        <img src="logo.svg" alt="" class="home-logo" />
+        <span class="home-label">My Home</span>
+      </button>
+
+      <div class="section-divider"></div>
+
+      <!-- Bizbox -->
+      <button class="section-tab bizbox-tab" id="tab-bizbox" data-section="bizbox">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+        <span>Bizbox</span>
+      </button>
+
+      <!-- Lifebud -->
+      <button class="section-tab lifebud-tab" id="tab-lifebud" data-section="lifebud">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.343 4.343 1 7.5 1c1.88 0 3.71.885 4.5 2.414C12.79 1.885 14.62 1 16.5 1 19.657 1 23 3.343 23 7.191c0 4.105-5.37 8.863-11 14.402z"/>
+        </svg>
+        <span>Lifebud</span>
+      </button>
+    </div>
+
+    <div class="section-bar-right">
+      <!-- AI indicator -->
+      <div class="ai-badge" title="Agentic AI active">
+        <span class="ai-dot"></span>
+        <span class="ai-label">AI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW 2: Browser Tabs + Nav Controls + Address Bar ═══ -->
+  <div id="browser-bar">
     <!-- Nav buttons -->
     <div class="nav-buttons">
       <button id="btn-back" class="nav-btn" title="Back" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <button id="btn-forward" class="nav-btn" title="Forward" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <button id="btn-reload" class="nav-btn" title="Reload">
         <svg id="icon-reload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -27,11 +67,20 @@
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
         <svg id="icon-stop" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
+
+    <!-- Browser tabs strip -->
+    <div id="tabs-strip">
+      <!-- tabs injected by JS -->
+    </div>
+
+    <!-- New tab button -->
+    <button id="btn-new-tab" class="new-tab-btn" title="New Tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
 
     <!-- Address bar -->
     <div class="address-bar-wrap">
@@ -42,22 +91,10 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </span>
-        <input
-          id="address-input"
-          type="text"
-          class="address-input"
+        <input id="address-input" type="text" class="address-input"
           placeholder="Search or enter address"
-          autocomplete="off"
-          spellcheck="false"
-        />
+          autocomplete="off" spellcheck="false" />
       </div>
-    </div>
-
-    <!-- Home button -->
-    <div class="right-buttons">
-      <button id="btn-home" class="home-btn" title="ThriveOS Home">
-        <img src="logo.svg" alt="ThriveOS" class="logo-img" />
-      </button>
     </div>
   </div>
 

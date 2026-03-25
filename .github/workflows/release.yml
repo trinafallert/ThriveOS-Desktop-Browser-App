@@ -44,9 +44,15 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: electron/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - name: Install Next.js dependencies
+        run: npm ci
+
+      - name: Build Next.js static export
+        run: npm run build
+
+      - name: Install Electron dependencies
         working-directory: electron
         run: npm ci
 

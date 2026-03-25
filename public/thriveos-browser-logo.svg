@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#f0e6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ddf4ff;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#e8d5ff;stop-opacity:0" />
+    </radialGradient>
+
+    <!-- Swirl 1: Soft purple -->
+    <linearGradient id="swirl1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c9a8f5;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0.4" />
+    </linearGradient>
+    <!-- Swirl 2: Pastel blue -->
+    <linearGradient id="swirl2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#93c5fd;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#67e8f9;stop-opacity:0.4" />
+    </linearGradient>
+    <!-- Swirl 3: Soft green -->
+    <linearGradient id="swirl3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#86efac;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#6ee7b7;stop-opacity:0.4" />
+    </linearGradient>
+    <!-- Swirl 4: Pastel pink -->
+    <linearGradient id="swirl4" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#f9a8d4;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#fca5a5;stop-opacity:0.4" />
+    </linearGradient>
+
+    <clipPath id="circleClip">
+      <circle cx="100" cy="100" r="90" />
+    </clipPath>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#e0d4ff" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Main circle background -->
+  <circle cx="100" cy="100" r="90" fill="url(#bgGrad)" />
+
+  <!-- Swirl strokes - large flowing curves going different directions -->
+  <g clip-path="url(#circleClip)">
+
+    <!-- Purple swirl - large arc top-left to bottom-right -->
+    <path d="M 30 60 C 60 20, 130 30, 150 80 C 170 130, 140 170, 100 165 C 60 160, 40 130, 55 100 C 70 70, 100 65, 120 80"
+          fill="none" stroke="url(#swirl1)" stroke-width="12" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- Blue swirl - arc from top-right going left and down -->
+    <path d="M 160 45 C 130 10, 60 25, 40 70 C 20 115, 45 160, 85 170 C 125 180, 160 155, 165 115 C 170 75, 145 55, 120 60"
+          fill="none" stroke="url(#swirl2)" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Green swirl - tighter inner arc -->
+    <path d="M 100 25 C 145 30, 175 70, 168 110 C 161 150, 130 175, 95 168 C 60 161, 38 135, 42 100"
+          fill="none" stroke="url(#swirl3)" stroke-width="8" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- Pink swirl - small inner curl -->
+    <path d="M 70 40 C 110 15, 160 50, 155 90 C 150 130, 115 155, 80 145 C 45 135, 35 105, 50 80 C 65 55, 90 50, 110 65 C 130 80, 135 105, 120 120"
+          fill="none" stroke="url(#swirl4)" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Center glow -->
+    <circle cx="100" cy="100" r="35" fill="url(#glowGrad)" />
+
+    <!-- Small accent dots -->
+    <circle cx="100" cy="100" r="6" fill="#ffffff" opacity="0.9"/>
+    <circle cx="100" cy="100" r="3" fill="#d8b4fe" opacity="0.8"/>
+
+  </g>
+
+  <!-- Subtle outer glow ring -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#c4b5fd" stroke-width="2" opacity="0.4"/>
+</svg>

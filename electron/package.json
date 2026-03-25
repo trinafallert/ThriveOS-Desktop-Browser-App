@@ -19,7 +19,11 @@
       "main.js",
       "preload.js",
       "src/**",
-      "build/**"
+      "build/**",
+      "../out/**"
+    ],
+    "extraResources": [
+      { "from": "../out", "to": "out" }
     ],
     "mac": {
       "target": [

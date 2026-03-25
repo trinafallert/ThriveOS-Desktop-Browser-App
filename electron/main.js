@@ -1,12 +1,15 @@
 const { app, BrowserWindow, BrowserView, ipcMain, shell, Menu } = require('electron')
 const path = require('path')
 
-// ThriveOS section URLs — update HOME_URL to your deployed Cloudflare Pages URL
-const HOME_URL = 'https://thriveos-bizbox-lifebud.pages.dev'
+// Load the bundled Next.js static export — works both in dev and when packaged
+const OUT_DIR = app.isPackaged
+  ? path.join(process.resourcesPath, 'out')
+  : path.join(__dirname, '..', 'out')
+const HOME_URL = `file://${OUT_DIR}/index.html`
 const SECTION_URLS = {
   home: HOME_URL,
-  bizbox: `${HOME_URL}/dashboard/bizbox`,
-  lifebud: `${HOME_URL}/dashboard/lifebud`,
+  bizbox: `file://${OUT_DIR}/dashboard/bizbox/index.html`,
+  lifebud: `file://${OUT_DIR}/dashboard/lifebud/index.html`,
 }
 
 // Chrome-style tab bar + ThriveOS section tabs + nav toolbar

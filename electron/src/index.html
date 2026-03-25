@@ -9,13 +9,11 @@
 </head>
 <body>
 
-  <!-- ═══ ROW 1: ThriveOS Section Tabs (My Home, Bizbox, Lifebud) ═══ -->
+  <!-- ═══ ROW 1: ThriveOS Section Tabs ═══ -->
   <div id="section-bar">
     <div class="section-bar-left">
-      <!-- macOS traffic light spacer -->
       <div class="traffic-light-spacer"></div>
 
-      <!-- My Home — enlarged, glowing, prominent -->
       <button class="section-tab home-tab active" id="tab-home" data-section="home">
         <span class="home-glow-ring"></span>
         <img src="logo.svg" alt="" class="home-logo" />
@@ -24,7 +22,6 @@
 
       <div class="section-divider"></div>
 
-      <!-- Bizbox -->
       <button class="section-tab bizbox-tab" id="tab-bizbox" data-section="bizbox">
         <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="3" width="20" height="14" rx="2"/>
@@ -33,7 +30,6 @@
         <span>Bizbox</span>
       </button>
 
-      <!-- Lifebud -->
       <button class="section-tab lifebud-tab" id="tab-lifebud" data-section="lifebud">
         <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.343 4.343 1 7.5 1c1.88 0 3.71.885 4.5 2.414C12.79 1.885 14.62 1 16.5 1 19.657 1 23 3.343 23 7.191c0 4.105-5.37 8.863-11 14.402z"/>
@@ -43,17 +39,39 @@
     </div>
 
     <div class="section-bar-right">
-      <!-- AI indicator -->
-      <div class="ai-badge" title="Agentic AI active">
+      <!-- Focus Mode -->
+      <button id="btn-focus" class="icon-btn focus-btn" title="Focus Mode (⌘⇧F)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M3 9V5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/>
+        </svg>
+      </button>
+
+      <!-- Quick Clip -->
+      <button id="btn-clip" class="icon-btn clip-btn" title="Clip to ThriveOS (⌘⇧S)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+
+      <!-- Command Palette trigger -->
+      <button id="btn-command" class="command-trigger" title="Command Palette (⌘K)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <span class="command-hint">⌘K</span>
+      </button>
+
+      <!-- AI Sidebar toggle -->
+      <button id="btn-ai" class="ai-sidebar-toggle" title="AI Assistant (⌘\)">
         <span class="ai-dot"></span>
         <span class="ai-label">AI</span>
-      </div>
+      </button>
     </div>
   </div>
 
-  <!-- ═══ ROW 2: Browser Tabs + Nav Controls + Address Bar ═══ -->
+  <!-- ═══ ROW 2: Browser Tabs + Nav + Address Bar ═══ -->
   <div id="browser-bar">
-    <!-- Nav buttons -->
     <div class="nav-buttons">
       <button id="btn-back" class="nav-btn" title="Back" disabled>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -72,17 +90,12 @@
       </button>
     </div>
 
-    <!-- Browser tabs strip -->
-    <div id="tabs-strip">
-      <!-- tabs injected by JS -->
-    </div>
+    <div id="tabs-strip"></div>
 
-    <!-- New tab button -->
-    <button id="btn-new-tab" class="new-tab-btn" title="New Tab">
+    <button id="btn-new-tab" class="new-tab-btn" title="New Tab (⌘T)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
 
-    <!-- Address bar -->
     <div class="address-bar-wrap">
       <div class="address-bar-inner">
         <span id="security-icon" class="security-icon">
@@ -97,6 +110,118 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══ COMMAND PALETTE ═══ -->
+  <div id="command-palette" class="hidden">
+    <div class="palette-backdrop" id="palette-backdrop"></div>
+    <div class="palette-modal">
+      <div class="palette-search-row">
+        <svg class="palette-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="palette-input" type="text" class="palette-input" placeholder="Search commands, go to Bizbox, Lifebud…" autocomplete="off" spellcheck="false" />
+        <kbd class="palette-esc-key">esc</kbd>
+      </div>
+      <div class="palette-results" id="palette-results"></div>
+      <div class="palette-footer">
+        <span><kbd>↑↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> select</span>
+        <span><kbd>esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ QUICK CLIP PANEL ═══ -->
+  <div id="clip-panel" class="hidden">
+    <div class="clip-backdrop" id="clip-backdrop"></div>
+    <div class="clip-modal">
+      <div class="clip-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#a78bfa;flex-shrink:0">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Clip to ThriveOS</span>
+        <button class="clip-close-btn" id="clip-close">×</button>
+      </div>
+      <div class="clip-url-display" id="clip-url-display"></div>
+      <textarea id="clip-note" class="clip-note" placeholder="Add a note (optional)…" rows="2"></textarea>
+      <div class="clip-actions">
+        <button class="clip-action bizbox-action" id="clip-to-bizbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+          Save to Bizbox
+        </button>
+        <button class="clip-action lifebud-action" id="clip-to-lifebud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0">
+            <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.343 4.343 1 7.5 1c1.88 0 3.71.885 4.5 2.414C12.79 1.885 14.62 1 16.5 1 19.657 1 23 3.343 23 7.191c0 4.105-5.37 8.863-11 14.402z"/>
+          </svg>
+          Save to Lifebud
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AI SIDEBAR ═══ -->
+  <div id="ai-sidebar" class="hidden">
+    <div class="ai-sidebar-inner">
+      <div class="ai-sidebar-header">
+        <div class="ai-sidebar-title">
+          <span class="ai-dot"></span>
+          ThriveOS AI
+        </div>
+        <button id="ai-sidebar-close" class="icon-btn" style="color:var(--text-muted)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="ai-quick-actions">
+        <button class="ai-quick-btn" id="ai-summarize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Summarize page
+        </button>
+        <button class="ai-quick-btn bizbox-quick" id="ai-to-bizbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+          Add to Bizbox
+        </button>
+        <button class="ai-quick-btn lifebud-quick" id="ai-to-lifebud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0">
+            <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.343 4.343 1 7.5 1c1.88 0 3.71.885 4.5 2.414C12.79 1.885 14.62 1 16.5 1 19.657 1 23 3.343 23 7.191c0 4.105-5.37 8.863-11 14.402z"/>
+          </svg>
+          Log to Lifebud
+        </button>
+      </div>
+
+      <div class="ai-messages" id="ai-messages">
+        <div class="ai-msg ai-msg-bot">
+          <div class="ai-avatar">AI</div>
+          <div class="ai-bubble">
+            I'm your ThriveOS OS — I connect your browsing to your businesses and life goals. Summarize pages, save to Bizbox, or log progress to Lifebud. What do you need?
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-input-row">
+        <input type="text" id="ai-input" class="ai-input" placeholder="Ask anything…" autocomplete="off" spellcheck="false" />
+        <button id="ai-send" class="ai-send-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FOCUS MODE BANNER ═══ -->
+  <div id="focus-banner" class="hidden">
+    <div class="focus-indicator">
+      <span class="focus-dot-anim"></span>
+      Focus Mode
+    </div>
+    <button id="focus-exit">Exit Focus</button>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div id="toast" class="toast hidden"></div>
 
   <script src="browser.js"></script>
 </body>

@@ -17,6 +17,12 @@ contextBridge.exposeInMainWorld('thriveos', {
   // Section navigation (ThriveOS special tabs)
   goToSection: (section) => ipcRenderer.send('go-to-section', section),
 
+  // Stop loading
+  stop: () => ipcRenderer.send('stop'),
+
+  // Quick Clip — save current URL to Bizbox or Lifebud
+  clipToSection: (section, url, note) => ipcRenderer.send('clip-to-section', { section, url, note }),
+
   // Events from main process
   onUrlChanged: (cb) => ipcRenderer.on('url-changed', (_, url) => cb(url)),
   onNavState: (cb) => ipcRenderer.on('nav-state', (_, state) => cb(state)),

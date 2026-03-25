@@ -240,6 +240,26 @@ ipcMain.on('reload', (event) => {
   s?.views.get(s.activeTabId)?.webContents.reload()
 })
 
+ipcMain.on('stop', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  const s = win && windowState.get(win.id)
+  s?.views.get(s.activeTabId)?.webContents.stop()
+})
+
+ipcMain.on('clip-to-section', (event, { section, url, note }) => {
+  // Future: write clip to local storage / Supabase
+  // For now, navigate to the target section so user sees it
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return
+  const s = windowState.get(win.id)
+  if (!s) return
+  const dest = SECTION_URLS[section] ?? HOME_URL
+  const view = s.views.get(s.activeTabId)
+  if (view) view.webContents.loadURL(dest)
+  s.activeSection = section
+  win.webContents.send('active-section', section)
+})
+
 ipcMain.on('go-home', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   const s = win && windowState.get(win.id)

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "electron .",
     "build:mac": "electron-builder --mac",
+    "build:macos": "electron-builder --mac",
     "build:win": "electron-builder --win",
+    "build:windows": "electron-builder --win",
     "build:linux": "electron-builder --linux"
   },
   "build": {

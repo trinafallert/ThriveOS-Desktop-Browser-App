@@ -22,17 +22,17 @@ jobs:
         include:
           - platform: macos
             os: macos-latest
-            artifact_glob: 'electron/dist/*.dmg'
+            artifact_glob: 'electron/dist/**/*.dmg'
             artifact_name: ThriveOS-mac
 
           - platform: windows
             os: windows-latest
-            artifact_glob: 'electron/dist/*.exe'
+            artifact_glob: 'electron/dist/**/*.exe'
             artifact_name: ThriveOS-win
 
           - platform: linux
             os: ubuntu-latest
-            artifact_glob: 'electron/dist/*.AppImage'
+            artifact_glob: 'electron/dist/**/*.AppImage'
             artifact_name: ThriveOS-linux
 
     runs-on: ${{ matrix.os }}
@@ -62,6 +62,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: List dist output (debug)
+        run: find electron/dist -type f 2>/dev/null || echo "electron/dist is empty or missing"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

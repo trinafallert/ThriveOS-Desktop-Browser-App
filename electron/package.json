@@ -21,15 +21,14 @@
       "main.js",
       "preload.js",
       "src/**",
-      "build/**",
-      "../out/**"
+      "build/**"
     ],
     "extraResources": [
       { "from": "../out", "to": "out" }
     ],
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["x64", "arm64"] }
+        { "target": "dmg", "arch": ["arm64"] }
       ],
       "icon": "build/icons/icon.icns",
       "category": "public.app-category.productivity",

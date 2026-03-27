@@ -79,15 +79,24 @@ jobs:
 
       - name: Build — ${{ matrix.platform }}
         working-directory: electron
-        run: npm run build:${{ matrix.platform }}
+        run: npm run build:${{ matrix.platform }} 2>&1 | tee /tmp/eb.log; exit ${PIPESTATUS[0]}
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          DEBUG: electron-builder
 
       - name: List dist output
+        if: always()
         run: find electron/dist -type f 2>/dev/null || echo "❌ electron/dist is empty or missing"
         shell: bash
+
+      - name: Upload electron-builder log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eb-log-${{ matrix.platform }}
+          path: /tmp/eb.log
+          if-no-files-found: warn
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

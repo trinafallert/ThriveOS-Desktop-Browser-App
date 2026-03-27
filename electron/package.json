@@ -24,11 +24,19 @@
       "build/**"
     ],
     "extraResources": [
-      { "from": "out-static", "to": "out" }
+      {
+        "from": "out-static",
+        "to": "out"
+      }
     ],
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["arm64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
       ],
       "icon": "build/icons/icon.icns",
       "category": "public.app-category.productivity",
@@ -36,14 +44,24 @@
     },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "build/icons/icon.ico",
       "artifactName": "ThriveOS_installer.exe"
     },
     "linux": {
       "target": [
-        { "target": "AppImage", "arch": ["x64"] }
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "build/icons/icon.png",
       "category": "Network",
@@ -62,6 +80,6 @@
   },
   "devDependencies": {
     "electron": "^32.0.0",
-    "electron-builder": "^25.0.0"
+    "electron-builder": "^26.8.1"
   }
 }

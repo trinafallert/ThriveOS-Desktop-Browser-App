@@ -79,11 +79,18 @@ jobs:
 
       - name: Build — ${{ matrix.platform }}
         working-directory: electron
-        run: npm run build:${{ matrix.platform }} 2>&1 | tee /tmp/eb.log; exit ${PIPESTATUS[0]}
+        run: |
+          npm run build:${{ matrix.platform }} > /tmp/eb.log 2>&1
+          BUILD_EXIT=$?
+          echo "=== electron-builder output ==="
+          cat /tmp/eb.log
+          echo "=== end of output (exit $BUILD_EXIT) ==="
+          exit $BUILD_EXIT
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          DEBUG: electron-builder
 
       - name: List dist output
         if: always()

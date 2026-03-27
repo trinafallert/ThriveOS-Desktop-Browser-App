@@ -2,6 +2,11 @@
   "name": "thriveos",
   "version": "1.0.0",
   "description": "ThriveOS Desktop Browser — your AI-powered OS for life and business",
+  "author": "ThriveOS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trinafallert/ThriveOS-Desktop-Browser-App"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -14,6 +19,7 @@
   "build": {
     "appId": "com.thriveos.browser",
     "productName": "ThriveOS",
+    "publish": null,
     "directories": {
       "output": "dist"
     },

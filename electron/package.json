@@ -24,7 +24,7 @@
       "build/**"
     ],
     "extraResources": [
-      { "from": "../out", "to": "out" }
+      { "from": "out-static", "to": "out" }
     ],
     "mac": {
       "target": [

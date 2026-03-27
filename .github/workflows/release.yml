@@ -42,7 +42,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -73,12 +73,24 @@ jobs:
           fi
         shell: bash
 
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'linux'
+        run: sudo apt-get install -y rpm fuse libfuse2 libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6
+
       - name: Install Electron dependencies
         working-directory: electron
         run: npm ci
 
       - name: Copy Next.js output into electron directory
         run: cp -r out electron/out-static
+        shell: bash
+
+      - name: Verify build environment
+        working-directory: electron
+        run: |
+          echo "node: $(node --version), npm: $(npm --version)"
+          echo "out-static files: $(find ../out-static -type f 2>/dev/null | wc -l)"
+          npx electron-builder --version
         shell: bash
 
       - name: Build — ${{ matrix.platform }}
@@ -88,6 +100,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          USE_HARD_LINKS: false
 
       - name: List dist output
         if: always()

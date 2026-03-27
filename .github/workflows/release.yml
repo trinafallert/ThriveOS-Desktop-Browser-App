@@ -50,17 +50,25 @@ jobs:
         run: npm ci
 
       - name: Build Next.js static export
-        run: npm run build
+        run: npm run build 2>&1 | tee /tmp/nextjs-build.log; exit ${PIPESTATUS[0]}
+        shell: bash
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
 
+      - name: Upload Next.js build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build-log-${{ matrix.platform }}
+          path: /tmp/nextjs-build.log
+
       - name: Verify out/ was created
         run: |
           if [ -d "out" ]; then
-            echo "✅ out/ exists, $(find out -type f | wc -l) files"
+            echo "✅ out/ exists with $(find out -type f | wc -l) files"
           else
-            echo "❌ out/ directory missing — Next.js build failed"
+            echo "❌ out/ directory missing"
             exit 1
           fi
         shell: bash

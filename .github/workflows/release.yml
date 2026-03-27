@@ -51,6 +51,19 @@ jobs:
 
       - name: Build Next.js static export
         run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+
+      - name: Verify out/ was created
+        run: |
+          if [ -d "out" ]; then
+            echo "✅ out/ exists, $(find out -type f | wc -l) files"
+          else
+            echo "❌ out/ directory missing — Next.js build failed"
+            exit 1
+          fi
+        shell: bash
 
       - name: Install Electron dependencies
         working-directory: electron
@@ -62,9 +75,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          DEBUG: electron-builder
 
-      - name: List dist output (debug)
-        run: find electron/dist -type f 2>/dev/null || echo "electron/dist is empty or missing"
+      - name: List dist output
+        run: find electron/dist -type f 2>/dev/null || echo "❌ electron/dist is empty or missing"
+        shell: bash
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -112,8 +127,8 @@ jobs:
             > First launch may show a security warning (builds are unsigned).
             > macOS: right-click → Open. Windows: "More info" → "Run anyway".
           files: |
-            artifacts/ThriveOS-mac/*.dmg
-            artifacts/ThriveOS-win/*.exe
-            artifacts/ThriveOS-linux/*.AppImage
+            artifacts/ThriveOS-mac/**/*.dmg
+            artifacts/ThriveOS-win/**/*.exe
+            artifacts/ThriveOS-linux/**/*.AppImage
           generate_release_notes: false
           fail_on_unmatched_files: false

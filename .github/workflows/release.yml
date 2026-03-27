@@ -82,15 +82,18 @@ jobs:
         run: |
           npm run build:${{ matrix.platform }} > /tmp/eb.log 2>&1
           BUILD_EXIT=$?
-          echo "=== electron-builder output ==="
+          echo "=== electron-builder log ==="
           cat /tmp/eb.log
-          echo "=== end of output (exit $BUILD_EXIT) ==="
+          echo "=== exit code: $BUILD_EXIT ==="
+          # Emit log lines as workflow notices so they appear in annotations API
+          while IFS= read -r line; do
+            echo "::notice title=eb-log::$line"
+          done < /tmp/eb.log
           exit $BUILD_EXIT
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          DEBUG: electron-builder
 
       - name: List dist output
         if: always()

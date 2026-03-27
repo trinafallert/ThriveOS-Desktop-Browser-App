@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build:
@@ -95,12 +96,32 @@ jobs:
 
       - name: Build — ${{ matrix.platform }}
         working-directory: electron
-        run: npm run build:${{ matrix.platform }}
+        run: |
+          npm run build:${{ matrix.platform }} > "$HOME/eb.log" 2>&1
+          echo "Exit: $?"
+          exit $?
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
           USE_HARD_LINKS: false
+
+      - name: Post log to GitHub issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const os = require('os');
+            const logPath = os.homedir() + '/eb.log';
+            let log = 'no log file';
+            try { log = fs.readFileSync(logPath, 'utf8').slice(0, 60000); } catch(e) {}
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Build log: ${{ matrix.platform }} run#${context.runId}`,
+              body: '```\n' + log + '\n```'
+            });
 
       - name: List dist output
         if: always()

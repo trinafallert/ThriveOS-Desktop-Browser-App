@@ -14,9 +14,12 @@ contextBridge.exposeInMainWorld('thriveAPI', {
   closeTab:  (tabId)      => ipcRenderer.send('close-tab', tabId),
   switchTab: (tabId)      => ipcRenderer.send('switch-tab', tabId),
 
+  // AI side panel
+  togglePanel: () => ipcRenderer.send('toggle-panel'),
+
   // Generic event listener (for renderer to subscribe to main-process events)
   on: (channel, cb) => {
-    const allowed = ['tab-title','tab-url','tab-favicon','tab-loading','nav-state','toast','open-tab']
+    const allowed = ['tab-title','tab-url','tab-favicon','tab-loading','nav-state','toast','open-tab','panel-state']
     if (!allowed.includes(channel)) return
     ipcRenderer.on(channel, (_, data) => cb(data))
   },

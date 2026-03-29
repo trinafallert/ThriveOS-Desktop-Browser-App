@@ -147,6 +147,11 @@ api.on('nav-state',({canGoBack,canGoForward})=>{ $back.disabled=!canGoBack;$forw
 api.on('toast',msg=>toast(msg));
 api.on('open-tab',({url})=>openTab(url||null));
 
+// AI panel toggle
+const $aiBtn = document.getElementById('btn-ai-panel');
+$aiBtn.addEventListener('click',()=>{ api.togglePanel(); });
+api.on('panel-state',({open})=>{ $aiBtn.classList.toggle('active',open); });
+
 // Shortcuts
 document.addEventListener('keydown',e=>{
   const mod=e.metaKey||e.ctrlKey; if(!mod)return;

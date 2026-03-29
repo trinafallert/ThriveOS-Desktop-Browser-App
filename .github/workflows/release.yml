@@ -78,6 +78,27 @@ jobs:
         if: matrix.platform == 'linux'
         run: sudo apt-get install -y rpm fuse libfuse2 libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install extension dependencies
+        working-directory: extension
+        run: bun install --frozen-lockfile
+
+      - name: Build extension (BrowserOS UI rebranded for ThriveOS)
+        working-directory: extension
+        run: bun run build
+        env:
+          # Disable analytics/sentry keys
+          VITE_PUBLIC_POSTHOG_KEY: ''
+          VITE_PUBLIC_SENTRY_DSN: ''
+
+      - name: Copy extension build into electron directory
+        run: cp -r extension/dist electron/extension-dist
+        shell: bash
+
       - name: Install Electron dependencies
         working-directory: electron
         run: npm ci

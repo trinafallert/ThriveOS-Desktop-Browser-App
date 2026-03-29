@@ -26,13 +26,19 @@
     "files": [
       "main.js",
       "preload.js",
+      "agent-server.js",
       "src/**",
-      "build/**"
+      "build/**",
+      "node_modules/**"
     ],
     "extraResources": [
       {
         "from": "out-static",
         "to": "out"
+      },
+      {
+        "from": "extension-dist",
+        "to": "extension"
       }
     ],
     "mac": {
@@ -83,6 +89,10 @@
       "background": null,
       "backgroundColor": "#0f172a"
     }
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "electron-store": "^8.1.0"
   },
   "devDependencies": {
     "electron": "^32.0.0",

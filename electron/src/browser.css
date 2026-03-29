@@ -184,6 +184,8 @@ html, body {
 }
 .bar-btn:hover { background: var(--tab-hover); color: var(--text); }
 .bar-btn svg { width: 14px; height: 14px; }
+.bar-btn.active { background: var(--tab-hover); color: var(--pin-home); }
+#btn-ai-panel.active svg { stroke: var(--pin-home); }
 
 /* ═══ CONTENT ═══ */
 #webview-container {

@@ -1,0 +1,13 @@
+const repoUrl = 'https://github.com/trinafallert/ThriveOS-Desktop-Browser-App'
+export const docsUrl = repoUrl
+export const productWebUrl = repoUrl
+export const productRepositoryUrl = repoUrl
+export const githubOrgUrl = 'https://github.com/trinafallert'
+export const privacyPolicyUrl = repoUrl
+export const contributorsUrl = repoUrl
+export const discordUrl = repoUrl
+export const slackUrl = repoUrl
+export const productVideoUrl = repoUrl
+export const productRepositoryShortUrl = repoUrl
+export const workflowsHelpUrl = repoUrl
+export const scheduledTasksHelpUrl = repoUrl

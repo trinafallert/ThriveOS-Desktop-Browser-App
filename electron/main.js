@@ -1,5 +1,6 @@
-const { app, BrowserWindow, BrowserView, ipcMain, shell, Menu } = require('electron')
+const { app, BrowserWindow, BrowserView, ipcMain, shell, Menu, session } = require('electron')
 const path = require('path')
+const agentServer = require('./agent-server')
 
 // Load the bundled Next.js static export — works both in dev and when packaged
 const OUT_DIR = app.isPackaged
@@ -14,6 +15,8 @@ const SECTION_URLS = {
 
 // Single-bar layout: just the toolbar row
 const TOOLBAR_HEIGHT = 40
+// AI side panel width (0 = hidden)
+const PANEL_WIDTH = 380
 
 // Per-window state
 const windowState = new Map()
@@ -51,6 +54,8 @@ function createWindow() {
     activeTabId: firstTab.id,
     views: new Map([[firstTab.id, firstView]]),
     activeSection: 'home',
+    panelOpen: false,
+    panelView: null,
   }
   windowState.set(mainWindow.id, state)
 
@@ -70,8 +75,9 @@ function createWindow() {
   mainWindow.on('resize', () => {
     const s = windowState.get(mainWindow.id)
     if (!s) return
-    const view = s.views.get(s.activeTabId)
+    const view = s.views.get(s.activeTabId) ?? (s.activePinned && s.pinnedViews?.get(s.activePinned))
     if (view) updateViewBounds(mainWindow, view)
+    updatePanelBounds(mainWindow)
   })
 
   mainWindow.once('ready-to-show', () => mainWindow.show())
@@ -143,12 +149,32 @@ function createBrowserView(win, tab) {
   return view
 }
 
+function getPanelWidth(win) {
+  const s = windowState.get(win.id)
+  return s?.panelOpen ? PANEL_WIDTH : 0
+}
+
 function updateViewBounds(win, view) {
   const { width, height } = win.getContentBounds()
+  const panelW = getPanelWidth(win)
   view.setBounds({
     x: 0,
     y: TOOLBAR_HEIGHT,
-    width,
+    width: Math.max(0, width - panelW),
+    height: Math.max(0, height - TOOLBAR_HEIGHT),
+  })
+}
+
+function updatePanelBounds(win) {
+  const s = windowState.get(win.id)
+  if (!s?.panelView) return
+  const { width, height } = win.getContentBounds()
+  const panelW = getPanelWidth(win)
+  if (panelW === 0) return
+  s.panelView.setBounds({
+    x: width - panelW,
+    y: TOOLBAR_HEIGHT,
+    width: panelW,
     height: Math.max(0, height - TOOLBAR_HEIGHT),
   })
 }
@@ -329,6 +355,45 @@ ipcMain.on('switch-tab', (event, tabId) => {
   if (s) switchToTab(win, s, tabId)
 })
 
+// AI side panel toggle
+ipcMain.on('toggle-panel', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return
+  const s = windowState.get(win.id)
+  if (!s) return
+
+  s.panelOpen = !s.panelOpen
+
+  if (s.panelOpen) {
+    // Create panel view if needed
+    if (!s.panelView) {
+      const EXTENSION_DIR = app.isPackaged
+        ? path.join(process.resourcesPath, 'extension')
+        : path.join(__dirname, 'extension-dist')
+      const panelUrl = `file://${EXTENSION_DIR}/sidepanel/index.html`
+      s.panelView = new BrowserView({
+        webPreferences: {
+          contextIsolation: true,
+          nodeIntegration: false,
+          // Allow extension to call localhost API
+          webSecurity: false,
+        },
+      })
+      s.panelView.webContents.loadURL(panelUrl)
+    }
+    win.addBrowserView(s.panelView)
+    updatePanelBounds(win)
+  } else {
+    if (s.panelView) win.removeBrowserView(s.panelView)
+  }
+
+  // Resize the page content
+  const pageView = s.views.get(s.activeTabId) ?? (s.activePinned && s.pinnedViews?.get(s.activePinned))
+  if (pageView) updateViewBounds(win, pageView)
+
+  win.webContents.send('panel-state', { open: s.panelOpen })
+})
+
 ipcMain.handle('get-current-url', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return HOME_URL
@@ -392,7 +457,10 @@ function buildMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Start local AI server (Claude proxy on port 3747)
+  agentServer.createServer()
+
   buildMenu()
   createWindow()
   app.on('activate', () => {
@@ -401,5 +469,6 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  agentServer.stopServer()
   if (process.platform !== 'darwin') app.quit()
 })

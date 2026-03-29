@@ -1,33 +1,23 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('thriveos', {
+contextBridge.exposeInMainWorld('thriveAPI', {
   // Navigation
-  navigate: (url) => ipcRenderer.send('navigate', url),
-  goBack: () => ipcRenderer.send('go-back'),
-  goForward: () => ipcRenderer.send('go-forward'),
-  reload: () => ipcRenderer.send('reload'),
-  goHome: () => ipcRenderer.send('go-home'),
-  getCurrentUrl: () => ipcRenderer.invoke('get-current-url'),
+  navigate:       (url)     => ipcRenderer.send('navigate', url),
+  goBack:         ()        => ipcRenderer.send('go-back'),
+  goForward:      ()        => ipcRenderer.send('go-forward'),
+  reload:         ()        => ipcRenderer.send('reload'),
+  stop:           ()        => ipcRenderer.send('stop'),
+  navigatePinned: (section) => ipcRenderer.send('navigate-pinned', section),
 
   // Tabs
-  newTab: (url) => ipcRenderer.send('new-tab', url),
-  closeTab: (tabId) => ipcRenderer.send('close-tab', tabId),
-  switchTab: (tabId) => ipcRenderer.send('switch-tab', tabId),
+  newTab:    (tabId, url) => ipcRenderer.send('new-tab', { tabId, url }),
+  closeTab:  (tabId)      => ipcRenderer.send('close-tab', tabId),
+  switchTab: (tabId)      => ipcRenderer.send('switch-tab', tabId),
 
-  // Section navigation (ThriveOS special tabs)
-  goToSection: (section) => ipcRenderer.send('go-to-section', section),
-
-  // Stop loading
-  stop: () => ipcRenderer.send('stop'),
-
-  // Quick Clip — save current URL to Bizbox or Lifebud
-  clipToSection: (section, url, note) => ipcRenderer.send('clip-to-section', { section, url, note }),
-
-  // Events from main process
-  onUrlChanged: (cb) => ipcRenderer.on('url-changed', (_, url) => cb(url)),
-  onNavState: (cb) => ipcRenderer.on('nav-state', (_, state) => cb(state)),
-  onLoading: (cb) => ipcRenderer.on('loading', (_, isLoading) => cb(isLoading)),
-  onTabsChanged: (cb) => ipcRenderer.on('tabs-changed', (_, tabs) => cb(tabs)),
-  onActiveTabChanged: (cb) => ipcRenderer.on('active-tab-changed', (_, tabId) => cb(tabId)),
-  onActiveSection: (cb) => ipcRenderer.on('active-section', (_, section) => cb(section)),
+  // Generic event listener (for renderer to subscribe to main-process events)
+  on: (channel, cb) => {
+    const allowed = ['tab-title','tab-url','tab-favicon','tab-loading','nav-state','toast','open-tab']
+    if (!allowed.includes(channel)) return
+    ipcRenderer.on(channel, (_, data) => cb(data))
+  },
 })

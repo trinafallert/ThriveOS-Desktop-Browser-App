@@ -12,11 +12,8 @@ const SECTION_URLS = {
   lifebud: `file://${OUT_DIR}/dashboard/lifebud/index.html`,
 }
 
-// Chrome-style tab bar + ThriveOS section tabs + nav toolbar
-// Layout: [ThriveOS section tabs row] [browser tabs + nav row]
-const SECTION_BAR_HEIGHT = 44  // top row: My Home / Bizbox / Lifebud
-const TAB_BAR_HEIGHT = 40      // second row: browser tabs + nav + address
-const TOOLBAR_HEIGHT = SECTION_BAR_HEIGHT + TAB_BAR_HEIGHT
+// Single-bar layout: just the toolbar row
+const TOOLBAR_HEIGHT = 40
 
 // Per-window state
 const windowState = new Map()
@@ -40,7 +37,7 @@ function createWindow() {
       sandbox: true,
     },
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-    backgroundColor: '#0f0a1a',
+    backgroundColor: '#f2f0fa',
     show: false,
     icon: path.join(__dirname, 'build', 'icons', 'icon.png'),
   })
@@ -100,55 +97,45 @@ function createBrowserView(win, tab) {
 
   view.webContents.on('did-navigate', (_, url) => {
     tab.url = url
+    win.webContents.send('tab-url', { tabId: tab.id, url })
     const s = windowState.get(win.id)
-    if (!s || s.activeTabId !== tab.id) return
-    win.webContents.send('url-changed', url)
-    win.webContents.send('nav-state', {
-      canGoBack: view.webContents.canGoBack(),
-      canGoForward: view.webContents.canGoForward(),
-    })
-    sendTabsState(win)
+    if (s?.activeTabId === tab.id) {
+      win.webContents.send('nav-state', { canGoBack: view.webContents.canGoBack(), canGoForward: view.webContents.canGoForward() })
+    }
   })
 
   view.webContents.on('did-navigate-in-page', (_, url) => {
     tab.url = url
-    const s = windowState.get(win.id)
-    if (!s || s.activeTabId !== tab.id) return
-    win.webContents.send('url-changed', url)
-    sendTabsState(win)
+    win.webContents.send('tab-url', { tabId: tab.id, url })
   })
 
   view.webContents.on('page-title-updated', (_, title) => {
     tab.title = title
+    win.webContents.send('tab-title', { tabId: tab.id, title })
     win.setTitle(`${title} — ThriveOS`)
-    sendTabsState(win)
+  })
+
+  view.webContents.on('page-favicon-updated', (_, favicons) => {
+    if (favicons.length) win.webContents.send('tab-favicon', { tabId: tab.id, favicon: favicons[0] })
   })
 
   view.webContents.on('did-start-loading', () => {
     tab.loading = true
-    const s = windowState.get(win.id)
-    if (!s || s.activeTabId !== tab.id) return
-    win.webContents.send('loading', true)
-    sendTabsState(win)
+    win.webContents.send('tab-loading', { tabId: tab.id, loading: true })
   })
 
   view.webContents.on('did-stop-loading', () => {
     tab.loading = false
+    win.webContents.send('tab-loading', { tabId: tab.id, loading: false })
     const s = windowState.get(win.id)
-    if (!s || s.activeTabId !== tab.id) return
-    win.webContents.send('loading', false)
-    win.webContents.send('nav-state', {
-      canGoBack: view.webContents.canGoBack(),
-      canGoForward: view.webContents.canGoForward(),
-    })
-    sendTabsState(win)
+    if (s?.activeTabId === tab.id) {
+      win.webContents.send('nav-state', { canGoBack: view.webContents.canGoBack(), canGoForward: view.webContents.canGoForward() })
+    }
   })
 
   view.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('http')) {
-      // Open in new tab
-      const s = windowState.get(win.id)
-      if (s) openNewTab(win, s, url)
+      win.webContents.send('open-tab', { url })
     }
     return { action: 'deny' }
   })
@@ -204,6 +191,31 @@ function switchToTab(win, s, tabId) {
 }
 
 // ── IPC handlers ──────────────────────────────────────────────────────────────
+
+// Pinned tab navigation (Home / Bizbox / Lifebud)
+ipcMain.on('navigate-pinned', (event, section) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return
+  const s = windowState.get(win.id)
+  if (!s) return
+  const url = SECTION_URLS[section] ?? HOME_URL
+  // Reuse or create the pinned view for this section
+  let view = s.pinnedViews?.get(section)
+  if (!view) {
+    if (!s.pinnedViews) s.pinnedViews = new Map()
+    view = new BrowserView({ webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true } })
+    view.webContents.loadURL(url)
+    // Emit loading state
+    view.webContents.on('did-start-loading', () => win.webContents.send('tab-loading', { tabId: null, loading: true }))
+    view.webContents.on('did-stop-loading', () => win.webContents.send('tab-loading', { tabId: null, loading: false }))
+    s.pinnedViews.set(section, view)
+  }
+  s.activePinned = section
+  s.activeTabId  = null
+  win.setBrowserView(view)
+  updateViewBounds(win, view)
+  win.webContents.send('nav-state', { canGoBack: false, canGoForward: false })
+})
 
 ipcMain.on('navigate', (event, url) => {
   const win = BrowserWindow.fromWebContents(event.sender)
@@ -281,33 +293,33 @@ ipcMain.on('go-to-section', (event, section) => {
   win.webContents.send('active-section', section)
 })
 
-ipcMain.on('new-tab', (event, url) => {
+ipcMain.on('new-tab', (event, { tabId, url }) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return
   const s = windowState.get(win.id)
-  if (s) openNewTab(win, s, url)
+  if (!s) return
+
+  const tab = { id: tabId, url, title: 'New Tab', loading: true }
+  const view = createBrowserView(win, tab)
+  s.tabs.push(tab)
+  s.views.set(tab.id, view)
+  s.activeTabId  = tab.id
+  s.activePinned = null
+  win.setBrowserView(view)
+  updateViewBounds(win, view)
 })
 
 ipcMain.on('close-tab', (event, tabId) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return
   const s = windowState.get(win.id)
-  if (!s || s.tabs.length <= 1) return
-
-  const idx = s.tabs.findIndex((t) => t.id === tabId)
-  if (idx === -1) return
+  if (!s) return
 
   const view = s.views.get(tabId)
   view?.webContents.destroy()
   s.views.delete(tabId)
-  s.tabs.splice(idx, 1)
-
-  if (s.activeTabId === tabId) {
-    const newTab = s.tabs[Math.max(0, idx - 1)]
-    switchToTab(win, s, newTab.id)
-  } else {
-    sendTabsState(win)
-  }
+  s.tabs = s.tabs.filter((t) => t.id !== tabId)
+  // Renderer handles switching to the next tab via switch-tab IPC
 })
 
 ipcMain.on('switch-tab', (event, tabId) => {
@@ -349,8 +361,7 @@ function buildMenu() {
       label: 'File',
       submenu: [
         { label: 'New Tab', accelerator: 'CmdOrCtrl+T', click: (_, win) => {
-          const s = win && windowState.get(win.id)
-          if (s) openNewTab(win, s)
+          if (win) win.webContents.send('open-tab', { url: null })
         }},
         { label: 'New Window', accelerator: 'CmdOrCtrl+N', click: () => createWindow() },
         { type: 'separator' },
